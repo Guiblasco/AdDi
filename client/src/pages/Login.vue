@@ -2,14 +2,9 @@
   <q-page class="flex flex-center">
     <div class="q-pa-md" style="max-width: 400px">
 
-    <q-form
-      @submit="onSubmit"
-      @reset="onReset"
-      class="q-gutter-md"
-    >
       <q-input
         filled
-        v-model="name"
+        v-model="username"
         label="Escriu el teu usuari "
         hint=""
         lazy-rules
@@ -33,7 +28,6 @@
       <q-card-section class="text-center q-pa-none">
         <p class="text-grey-6">No estas registrat? <a href="#/Register">Registrat</a></p>
       </q-card-section>
-    </q-form>
 
   </div>
   </q-page>
@@ -41,6 +35,12 @@
 
 <script>
 export default {
-  name: 'PageIndex'
+  name: 'Login',
+  data () {
+    return {
+      username: '',
+      password: ''
+    }
+  }
 }
 </script>

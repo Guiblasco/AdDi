@@ -15,7 +15,7 @@
           Qualificacions App
         </q-toolbar-title>
 
-        <div>Data{{  }}</div>
+        <div>Data {{ getDateCat  }}</div>
       </q-toolbar>
     </q-header>
 
@@ -65,6 +65,13 @@ export default {
     return {
       leftDrawerOpen: false,
       essentialLinks: linksData
+    }
+  },
+  computed: {
+    getDateCat () {
+      const timeStamp = new Date(Date.now())
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+      return timeStamp.toLocaleDateString('ca-ES', options)
     }
   }
 }

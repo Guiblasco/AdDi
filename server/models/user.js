@@ -1,101 +1,57 @@
-var db=require('../db/database');
+var db = require("../db/database");
 
-class User{
+class User {
+  mydb = new db.Database();
 
-    mydb=new db.Database();
+  constructor() {}
 
-    constructor(){}
+  getNewId(callback) {
+    let conn = this.mydb.getConnection();
+    let sql = "SELECT max(id)+1 as newID FROM users";
+    conn.query(sql, (err, results, fields) => {
+      if (err) {
+        console.log(err);
+      } else {
+        conn.end();
+        callback(results[0].newID);
+      }
+    });
+  }
 
-    getAllPeople(callback){
-        let conn=this.mydb.getConnection();
-        let sql="SELECT name,height,eye_color,birth_year from people";
-        conn.query(sql,function(err,results,fields){
-            if(err){
-                console.log(err);
-            }
-            else{
-                conn.end();
-                callback(results,fields);
-            }
-        })
+  insertUser(username, password, full_name, callback) {
+    let conn = this.mydb.getConnection();
+    let sql =
+      "INSERT INTO users(id,username, password, full_name) " + "VALUES (?,?,?)";
 
-
-    }
-
-    getOneByID(id,callback){
-        let conn=this.mydb.getConnection();
-        let sql="SELECT name,height,eye_color,birth_year "+
-                "from people where id=?";
-        conn.query(sql,[id],function(err,results,fields){
-            if(err){
-                console.log(err);
-            }
-            else{
-                conn.end();
-                callback(results,fields);
-            }
-        })
-
-    }
-
-    getNewId(callback){
-        let conn=this.mydb.getConnection();
-        let sql="SELECT max(id)+1 as newID from people";
-        conn.query(sql, (err,results,fields)=>{
-            if (err){
-                console.log(err)
-            }
-            else{
-                conn.end();
-                callback(results[0].newID);
-            }
-        });
-    }
-
-    insertUser(name,height,eye_color,birth_year,callback){
-        let conn=this.mydb.getConnection();
-        let sql="INSERT INTO people(id,name,height,eye_color,birth_year) "+
-                "VALUES (?,?,?,?,?)"
-        
-        this.getNewId(function(newID){
-            conn.query(sql,[newID,name,height,eye_color,birth_year],(err,results,fields)=>{
-                if (err){
-                    console.log("Error inserint dades");
-                }
-                else{
-                    conn.end();
-                    callback(results);
-                }
-            })
-        });
-
-
-    }
-
-    updateUser(id,name,height,eye_color,birth_year,callback){
-        let conn=this.mydb.getConnection();
-        let sql="UPDATE people SET name=?,height=?,eye_color=?,birth_year=? "+
-                "WHERE id=?";
-        conn.query(sql,[name,height,eye_color,birth_year,id],(err,results,fields)=>{
-            if(err){
-                console.log(err);
-            }
-            else{
-                conn.end();
-                callback(results);
-            }
-        })
-    }
-
-    
-
-    deleteUser(id,callback){
-
-    }
-
-
+    this.getNewId(function (newID) {
+      conn.query(
+        sql,
+        [newID, username, password, full_name],
+        (err, results, fields) => {
+          if (err) {
+            console.log("Error inserint usuari");
+          } else {
+            conn.end();
+            callback(results);
+          }
+        }
+      );
+    });
+  }
+  login(username, password, callback) {
+    let conn = this.mydb.getConnection();
+    let sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+    conn.query(sql, [username, password], function (err, res) {
+      if (err) {
+        console.log(err);
+      } else {
+        conn.end();
+        callback(res);
+      }
+    });
+  }
 }
 
-module.exports={
-    User:User
-}
+module.exports = {
+  User: User,
+};

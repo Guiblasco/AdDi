@@ -1,15 +1,9 @@
 <template>
   <q-page class="flex flex-center">
     <div class="q-pa-md" style="max-width: 400px">
-
-    <q-form
-      @submit="onSubmit"
-      @reset="onReset"
-      class="q-gutter-md"
-    >
       <q-input
         filled
-        v-model="name"
+        v-model="nom"
         label="Escriu el teu nom "
         hint=""
         lazy-rules
@@ -17,15 +11,18 @@
       />
       <q-input
         filled
-        v-model="name"
+        v-model="cognom"
         label="Escriu el teus cognoms "
         hint=""
         lazy-rules
         :rules="[ val => val && val.length > 0 || 'escriu algo']"
       />
+    </div>
+    <div class="q-pa-md" style="max-width: 400px">
+
       <q-input
         filled
-        v-model="name"
+        v-model="dni"
         label="Escriu el teu DNI "
         hint=""
         lazy-rules
@@ -33,7 +30,7 @@
       />
       <q-input
         filled
-        v-model="name"
+        v-model="username"
         label="Escriu el teu usuari "
         hint=""
         lazy-rules
@@ -53,7 +50,6 @@
       <div>
         <q-btn label="Registrar-se" class="full-width" color="primary"/>
       </div>
-    </q-form>
 
   </div>
   </q-page>
@@ -61,6 +57,16 @@
 
 <script>
 export default {
-  name: 'PageIndex'
+  name: 'register',
+  data () {
+    return {
+      nom: '',
+      dni: '',
+      username: '',
+      cognom: '',
+      password: ''
+
+    }
+  }
 }
 </script>
