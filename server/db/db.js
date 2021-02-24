@@ -10,8 +10,8 @@ class Database{
             insecureAuth : true, 
             host     : '127.0.0.1',
             port     : '3306',
-            user     : 'root',
-            password : 'root',
+            user     : 'node',
+            password : 'node',
             database : 'docencia'
           }); 
     }
