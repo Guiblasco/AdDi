@@ -4,11 +4,12 @@ const accessTokenSecret = "toro";
 
 
 
+
 class User {
   mydb = new db.Database();
 
   constructor() {}
-
+//funcio que certifica si es profesor o no 
   isProfe(id,callback) {
     let conn = this.mydb.getConnection();
     let sql = "SELECT count(*) FROM docencia.alumne where id_alumne = ?"
@@ -35,8 +36,7 @@ class User {
         callback(results[0].newID);
       }
     });
-  }
-  
+  }  
 
   insertUser(username, password, full_name,dni,avatar,res,req) {
     let conn = this.mydb.getConnection();
@@ -67,7 +67,7 @@ class User {
                   username:req.body.username,
                   full_name:req.body.full_name,
                   role:"profe"
-                },accessTokenSecret)
+                },accessTokenSecret,{expiresIn:'2h'})
                 res.status(200).send({
                   OK:true,
                   result:"Profressor inserit amb exit",
@@ -107,38 +107,62 @@ class User {
     let conn = this.mydb.getConnection();
     let sql = "SELECT * FROM users WHERE username = ? AND password = ?";
     
-    conn.query(sql, [username, password], function (err, results) {
+    conn.query(sql, [username, password],(err, results) => {
       if (err) {
         console.log(err);
-        res.status(401).send({
+        res.status(500).send({
           OK:false,
-          error:"Error usuari no existe"
+          error:"Error en execucio de la consulta"
         })
       } else {
-        sql = "SELECT id FROM users WHERE id = ?"
-        let id = results[0].id
-        console.log(results)
-        conn.query(sql,[id],(err,results)=>{
-          if(err){
-            res.status(401).send({
-              OK:false,
-              error:"Error amb l'usuari"
-            })
-          }else{
-            new User().isProfe(id, (pro)=> {
-              let autToken = jwt.sign({
-                id:id,
-                username:req.body.username,
-                role: pro == 0 ? "profe": "alumno",
-              },accessTokenSecret)
-              res.status(200).send({
-                OK:true,
-                result:"Usuari Logejat",
-                token:autToken
+        if(results.length == 0){
+          res.status(404).send({
+            OK:false,
+            error:"Usuari  no existeix"
+          })
+        }else {
+          sql = "SELECT id FROM users WHERE id = ?"
+          let id = results[0].id
+          conn.query(sql,[id],(err,results)=>{
+            if(err){
+              res.status(401).send({
+                OK:false,
+                error:"Error amb l'usuari"
+              })
+            }else{
+              new User().isProfe(id, (pro)=> {
+                let autToken = jwt.sign({
+                  id:id,
+                  username:req.body.username,
+                  role: pro == 0 ? "profe": "alumno",
+                },accessTokenSecret,{expiresIn:'2h'})
+                res.status(200).send({
+                  OK:true,
+                  result:"Usuari Logejat",
+                  token:autToken
               });
             });
           }
+       })
+      }
+    }
+  })
+}
+
+  getAlumne(id,res){
+    let conn = this.mydb.getConnection()
+    let sql = "SELECT * FROM alumne WHERE id_alumne = ? "
+    conn.query(sql,[id],(err,results)=>{
+      if(err){
+        res.status(400).send({
+          OK:false,
+          erro: "l'alumno no existeix"
         })
+      }else{
+        
+        res.status(201).send({
+          OK:true,
+          results})
       }
     })
   }
