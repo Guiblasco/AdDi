@@ -21,7 +21,6 @@ https.createServer({
     },app).listen(PORT, function () {
     console.log("Servidor HTTPS escoltant al port" + PORT + "...");
   });
-
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (authHeader) {
@@ -37,25 +36,32 @@ const authenticateJWT = (req, res, next) => {
     res.sendStatus(401);
   }
 };
-
 app.post("/register", (req, res) => {
   var usuario = new User.User();
-  usuario.insertUser(
-    req.body.username,
-    req.body.password,
-    req.body.full_name,
-    req.body.dni,
-    req.body.avatar,
-    res,
-    req
-  );
+  if(!req.body.username || !req.body.password || !req.body.full_name || !req.body.dni){
+    res.status(400).send({
+      OK:false,
+      error:"Variables mal definides"
+    })
+  }else{
+    let { username,password,full_name,dni,avatar } = req.body;  
+    usuario.insertUser(username,password,full_name,dni,avatar,res,req);
+  }
 });
-
 app.post("/login", (req, res) => {
   var usuario = new User.User();
-  usuario.login(req.body.username, req.body.password, req, res);
-});
 
+  if(!req.user.username || !req.user.password ){
+    res.status(400).send({
+      OK:false,
+      error:"Variables mal definides"
+    }) 
+  }else {
+    let {username,password} = req.body
+    usuario.login(username ,password, req, res);
+  }
+  
+});
 app.get("/notes", authenticateJWT, (req, res) => {
   var notes = new Notes.Notes();
   let id = req.user.id;
@@ -76,6 +82,8 @@ app.get("/assignatura/:id", authenticateJWT, (req, res) => {
 });
 app.get("/modul",authenticateJWT,(req,res)=>{
   var modul = new Moduls.Moduls()
+
+
   let id = req.user.id
   let role = req.user.role
   modul.getModuls(id,role,res)
